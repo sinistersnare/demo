@@ -9,7 +9,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -51,38 +53,44 @@ public class MyDemoGame extends ApplicationAdapter {
 			Vector2 dir = new Vector2().set(touchPos.x, touchPos.y).sub(playerPos).nor();
 			bullets.add(new Bullet(playerPos.x + (player.getWidth() / 2), playerPos.y + player.getHeight(), dir));
 		}
-		if (MathUtils.random(200) == 42) {
-			System.out.println("spawning ememy");
+		if (MathUtils.random(60) == 1) {
 			Vector2 spawnPos = new Vector2(MathUtils.random(0f, 800f), 520);
 			Vector2 dir = new Vector2().set(playerPos).sub(spawnPos).nor();
 			Enemy nme = new Enemy(spawnPos.x, spawnPos.y, dir);
 			enemies.add(nme);
 		}
-		
+
 		player.translateX(playerSpeed * Gdx.graphics.getDeltaTime());
-		
-		
+
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
 		Iterator<Bullet> bs = bullets.iterator();
+		float delta = Gdx.graphics.getDeltaTime();
 		while (bs.hasNext()) {
 			Bullet b = bs.next();
-			b.tick(Gdx.graphics.getDeltaTime());
-			if (!b.dead) {
-				b.draw(batch);
-			} else {
+			Iterator<Enemy> es = enemies.iterator();
+			while (es.hasNext()) {
+				Enemy e = es.next();
+				if (Intersector.intersectRectangles(b.getBoundingRectangle(), e.getBoundingRectangle(),
+						new Rectangle())) {
+					b.dead = true;
+					e.dead = true;
+				}
+				if (e.dead) {
+					es.remove();
+				}
+			}
+			if (b.dead) {
 				bs.remove();
 			}
 		}
-		Iterator<Enemy> es = enemies.iterator();
-		while (es.hasNext()) {
-			Enemy e = es.next();
-			e.tick(Gdx.graphics.getDeltaTime());
-			if (!e.dead) {
-				e.draw(batch);
-			} else {
-				es.remove();
-			}
+		for (Bullet b : bullets) {
+			b.tick(delta);
+			b.draw(batch);
+		}
+		for (Enemy e : enemies) {
+			e.tick(delta);
+			e.draw(batch);
 		}
 		player.draw(batch);
 		batch.end();

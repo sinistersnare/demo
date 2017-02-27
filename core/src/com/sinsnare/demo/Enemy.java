@@ -13,7 +13,7 @@ public class Enemy extends Sprite {
 	public Enemy(float x, float y, Vector2 direction) {
 		super(new Texture("enemy.png"));
 		this.setPosition(x,  y);
-		speed = 50;
+		speed = 150;
 		currentDirection = direction;
 		velocity = new Vector2(currentDirection).scl(speed);
 		movement = new Vector2();

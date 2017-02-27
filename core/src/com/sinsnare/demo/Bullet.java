@@ -13,7 +13,7 @@ public class Bullet extends Sprite {
 	public Bullet(float x, float y, Vector2 direction) {
 		super(new Texture("bullet.png"));
 		this.setPosition(x,  y);
-		speed = 100;
+		speed = 300;
 		currentDirection = direction;
 		velocity = new Vector2(currentDirection).scl(speed);
 		movement = new Vector2();
