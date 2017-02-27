@@ -66,7 +66,8 @@ public class MyDemoGame extends ApplicationAdapter {
 		batch.begin();
 		Iterator<Bullet> bs = bullets.iterator();
 		float delta = Gdx.graphics.getDeltaTime();
-		while (bs.hasNext()) {
+
+		nextBullet: while (bs.hasNext()) {
 			Bullet b = bs.next();
 			Iterator<Enemy> es = enemies.iterator();
 			while (es.hasNext()) {
@@ -74,7 +75,10 @@ public class MyDemoGame extends ApplicationAdapter {
 				if (Intersector.intersectRectangles(b.getBoundingRectangle(), e.getBoundingRectangle(),
 						new Rectangle())) {
 					b.dead = true;
+					bs.remove();
 					e.dead = true;
+					es.remove();
+					continue nextBullet;
 				}
 				if (e.dead) {
 					es.remove();
